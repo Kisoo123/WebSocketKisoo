@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="member">
+	<select id="selectAllMembers" resultMap="memberResultMap">
+		select * from member order by MEMBER_ID
+	</select>
+	
+<select id="selectRoomId" resultType="java.lang.Integer" parameterType="map">
+<!--     SELECT room_Id
+    FROM chatroom
+    WHERE member_Id IN
+        <foreach item="item" collection="memberIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    GROUP BY room_Id
+    HAVING COUNT(DISTINCT member_Id) = #{memberSize}
+       AND COUNT(*) = #{memberSize}
+       
+        -->
+    SELECT room_Id
+	FROM chatroom
+	WHERE room_Id IN (
+	    SELECT room_Id
+	    FROM chatroom
+	    WHERE member_Id IN 
+        <foreach item="item" collection="memberIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	    GROUP BY room_Id
+	    HAVING COUNT(DISTINCT member_Id) = #{memberSize}
+	)
+	GROUP BY room_Id
+	HAVING COUNT(*) = #{memberSize}
+</select>
+
+        <select id="getSequenceValue" resultType="int">
+        SELECT seq_chatroom.nextval FROM dual
+    </select>
+    <insert id="insertSingleRoomId" parameterType="map">
+        INSERT INTO chatroom (room_Id, member_Id)
+        VALUES (#{roomId}, #{memberId})
+    </insert>
+	
+	<resultMap id="memberResultMap" type="member">
+	    <id property="memberId" column="member_id" />
+	    <result property="memberNickname" column="member_nickname" />
+	    <result property="memberGrade" column="member_grade" />
+	    <result property="memberPassword" column="member_password" />
+	    <result property="memberName" column="member_name" />
+	    <result property="memberPhone" column="member_phone" />
+	    <result property="memberEmail" column="member_email" />
+	    <result property="memberAddress" column="member_address" />
+	    <result property="memberIdNumber" column="member_id_number" />
+	    <result property="memberPoint" column="member_point" />
+	    <result property="memberNo" column="member_no" />
+	</resultMap>
+	
+	<select id="selectMemberById" resultMap="memberResultMap" parameterType="string">
+		select * from member where member_id = #{memberId}
+	</select>
+</mapper>

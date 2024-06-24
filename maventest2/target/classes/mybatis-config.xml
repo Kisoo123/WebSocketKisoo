@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+<configuration>
+	<!-- typealias, setting에 대한 설정만  -->
+<typeAliases>
+	<typeAlias type="com.ks.websocket.model.dto.Chat" alias="chat"/>
+	<typeAlias type="com.ks.websocket.member.model.dto.Member" alias="member"/>
+</typeAliases>
+	<typeHandlers>
+		        <typeHandler javaType="java.time.LocalDateTime" handler="com.ks.websocket.common.LocalDateTimeTypeHandler"/>
+	</typeHandlers>
+</configuration>
