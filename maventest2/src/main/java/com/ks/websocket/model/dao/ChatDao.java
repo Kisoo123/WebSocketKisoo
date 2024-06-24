@@ -9,9 +9,14 @@ import org.springframework.stereotype.Repository;
 
 import com.ks.websocket.member.model.dto.Member;
 import com.ks.websocket.model.dto.Chat;
+import com.ks.websocket.model.dto.ChatRoom;
 
 @Repository
 public class ChatDao {
+	public List<ChatRoom> selectMyRoomMembers(SqlSessionTemplate session, int roomNo){
+		return session.selectList("chat.selectMyRoomMembers",roomNo);
+	}
+
 	public Member selectMemberById(SqlSessionTemplate session,String memberId) {
 		return session.selectOne("member.selectMemberById",memberId);
 	}
@@ -38,27 +43,24 @@ public class ChatDao {
 		Integer result = session.selectOne("member.selectRoomId", param);
 		return result;
 	}	
-	public int insertRoomId(SqlSessionTemplate session, List<String> memberIds) {
+	public int insertRoomId(SqlSessionTemplate session, List<Integer> memberNos) {
         int result = 0;
         int roomId = session.selectOne("member.getSequenceValue");
 
-        for (int i = 0; i < memberIds.size(); i++) {
+        for (int i = 0; i < memberNos.size(); i++) {
             Map<String, Object> params = new HashMap<>();
-            System.out.println(memberIds.get(i));
+            System.out.println(memberNos.get(i));
             params.put("roomId", roomId);
-            params.put("memberId", memberIds.get(i));
+            params.put("memberNo", memberNos.get(i));
             result += session.insert("member.insertSingleRoomId", params);
         }
-        System.out.println("==================");
-        System.out.println(roomId);
-        System.out.println("==================chatDao");
         return roomId;
     }
 	public List<Member> selectRoomList(SqlSessionTemplate session, int roomId){
 		return session.selectList("chat.selectRoomList",roomId);
 	}
-	public List<Integer> selectMyRoomId(SqlSessionTemplate session, String memberId){
-		return session.selectList("chat.selectMyRoomId",memberId);
+	public List<Integer> selectMyRoomId(SqlSessionTemplate session, int memberNo){
+		return session.selectList("chat.selectMyRoomId",memberNo);
 	}
 
 }

@@ -193,7 +193,7 @@
             <ul class="friend-list">
                 <c:forEach var="m" items="${members}">
                     <c:if test="${m.memberId != loginMember.memberId}">
-                        <li class="friend-item" data-member-id="${m.memberId}">
+                        <li class="friend-item" data-member-no="${m.memberNo}">
                             <img src="profile1.jpg" alt="프로필 사진">
                             <div class="friend-info">
                                 <div class="friend-name">${m.memberId}</div>
@@ -237,7 +237,7 @@
             <ul class="friend-list" id="modalFriendList">
                 <c:forEach var="m" items="${members}">
                     <c:if test="${m.memberId != loginMember.memberId}">
-                        <li class="friend-item" data-member-id="${m.memberId}">
+                        <li class="friend-item" data-member-no="${m.memberNo}">
                             <img src="profile1.jpg" alt="프로필 사진">
                             <div class="friend-info">
                                 <div class="friend-name">${m.memberId}</div>
@@ -287,17 +287,17 @@
 
         // 친구 선택
         $('#modalFriendList').on('click', '.friend-item', function() {
-            const memberId = $(this).data('member-id');
+            const memberNo = $(this).data('member-no');
             
             if ($(this).hasClass('selected')) {
                 $(this).removeClass('selected');
-                const index = selectedMembers.indexOf(memberId);
+                const index = selectedMembers.indexOf(memberNo);
                 if (index > -1) {
                     selectedMembers.splice(index, 1);
                 }
             } else {
                 $(this).addClass('selected');
-                selectedMembers.push(memberId);
+                selectedMembers.push(memberNo);
             }
             console.log(selectedMembers);
         });
@@ -310,19 +310,19 @@
             });
 
             // 선택한 멤버들을 히든 필드로 추가
-            selectedMembers.forEach(function(memberId) {
+            selectedMembers.forEach(function(memberNo) {
                 $('<input>').attr({
                     'type': 'hidden',
-                    'name': 'memberId',
-                    'value': memberId
+                    'name': 'memberNo',
+                    'value': memberNo
                 }).appendTo(form);
             });
 
             // 히든 필드에 로그인한 사용자 ID 추가
             $('<input>').attr({
                 'type': 'hidden',
-                'name': 'memberId',
-                'value': '${loginMember.memberId}'
+                'name': 'memberNo',
+                'value': '${loginMember.memberNo}'
             }).appendTo(form);
 
             // 폼을 body에 추가하고 전송
@@ -394,7 +394,7 @@
         });
 
         function subscribeToRoom(roomId, recentMessageElement) {
-            var socket = new SockJS('http://localhost:8081/sock/ws-stomp');
+            var socket = new SockJS('http://localhost:8082/sock/ws-stomp');
             var stompClient = Stomp.over(socket);
             stompClient.connect({}, function(frame) {
                 console.log('Connected to room ' + roomId + ': ' + frame);

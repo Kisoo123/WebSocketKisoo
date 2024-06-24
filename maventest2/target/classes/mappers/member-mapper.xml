@@ -4,30 +4,19 @@
 	<select id="selectAllMembers" resultMap="memberResultMap">
 		select * from member order by MEMBER_ID
 	</select>
-	
+
 <select id="selectRoomId" resultType="java.lang.Integer" parameterType="map">
-<!--     SELECT room_Id
-    FROM chatroom
-    WHERE member_Id IN
-        <foreach item="item" collection="memberIds" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-    GROUP BY room_Id
-    HAVING COUNT(DISTINCT member_Id) = #{memberSize}
-       AND COUNT(*) = #{memberSize}
-       
-        -->
     SELECT room_Id
 	FROM chatroom
 	WHERE room_Id IN (
 	    SELECT room_Id
 	    FROM chatroom
-	    WHERE member_Id IN 
-        <foreach item="item" collection="memberIds" open="(" separator="," close=")">
+	    WHERE member_no IN 
+        <foreach item="item" collection="memberNos" open="(" separator="," close=")">
             #{item}
         </foreach>
 	    GROUP BY room_Id
-	    HAVING COUNT(DISTINCT member_Id) = #{memberSize}
+	    HAVING COUNT(DISTINCT member_no) = #{memberSize}
 	)
 	GROUP BY room_Id
 	HAVING COUNT(*) = #{memberSize}
@@ -37,8 +26,8 @@
         SELECT seq_chatroom.nextval FROM dual
     </select>
     <insert id="insertSingleRoomId" parameterType="map">
-        INSERT INTO chatroom (room_Id, member_Id)
-        VALUES (#{roomId}, #{memberId})
+        INSERT INTO chatroom (room_Id, member_No)
+        VALUES (#{roomId}, #{memberNo})
     </insert>
 	
 	<resultMap id="memberResultMap" type="member">

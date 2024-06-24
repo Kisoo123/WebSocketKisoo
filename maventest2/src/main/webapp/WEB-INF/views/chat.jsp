@@ -155,7 +155,6 @@
     var roomId = ${roomId};
     var chatList = ${chatList};
 
-
     function setConnected(connected) {
         if (connected) {
             $("#conversation").show();
@@ -163,10 +162,11 @@
             $("#conversation").hide();
         }
         $("#message").html("");
+        console.log(chatList);
     }
 
     function connect() {
-        var socket = new SockJS('http://localhost:8081/sock/ws-stomp');
+        var socket = new SockJS('http://localhost:8082/sock/ws-stomp');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
             setConnected(true);
@@ -189,54 +189,56 @@
     }
 
     // html에서 입력값, roomId를 받아서 Controller로 전달
-    function sendChat() {
-        var message = $("#message").val();
-        if (message.trim() === "") {
-            return; // 입력값이 없으면 전송하지 않음
-        }
-        stompClient.send("/send/" + roomId, {},
-            JSON.stringify({
-                'roomId': roomId,
-                'sender': '${loginMember.memberId}',
-                'message': message,
-                'sendDate': new Date().toISOString()
-            }));
-        $('#message').val('');
-        $("#conversation").scrollTop($("#conversation")[0].scrollHeight); // 스크롤 맨 아래로 이동
-
+// sendChat 함수
+function sendChat() {
+    var message = $("#message").val();
+    if (message.trim() === "") {
+        return; // 입력값이 없으면 전송하지 않음
     }
 
-    // 저장된 채팅 불러오기
-    function loadChat(chatList) {
-        if (chatList != null) {
-            for (var chat in chatList) {
-                var messageClass = chatList[chat].sender === '${loginMember.memberId}' ? 'sent' : 'received';
-                
-                $("#chatting").append(
-                    '<div class="message ' + messageClass + '"><div class="bubble ' + messageClass + '">' 
-                    + '<div class="sender">' + chatList[chat].sender + '</div>' // 보낸 사람 이름 추가
-                    + chatList[chat].message 
-                    + '<div class="sendDate">' + chatList[chat].sendDate + '</div></div></div>'
-                );
-            }
-            $("#conversation").scrollTop($("#conversation")[0].scrollHeight);
+    stompClient.send("/send/" + roomId, {},
+        JSON.stringify({
+            'roomId': roomId,
+            'memberNo': '${loginMember.memberNo}', // 수정된 부분
+            'message': message,
+            'sendDate': new Date().toISOString()
+        }));
+    $('#message').val('');
+    $("#conversation").scrollTop($("#conversation")[0].scrollHeight); // 스크롤 맨 아래로 이동
+}
+
+// loadChat 함수
+function loadChat(chatList) {
+    if (chatList != null) {
+        for (var chat in chatList) {
+            var messageClass = chatList[chat].memberNo.toString() === '${loginMember.memberNo}' ? 'sent' : 'received'; // 수정된 부분
+            console.log("dsanlkdsankl++++++"+chatList[chat].memberNo);
+            console.log("dsanlkdsankl++++++"+'${loginMember.memberNo}'+"멤버");
+            $("#chatting").append(
+                '<div class="message ' + messageClass + '"><div class="bubble ' + messageClass + '">' 
+                + '<div class="sender">' + chatList[chat].memberNo + '</div>' // 수정된 부분
+                + chatList[chat].message 
+                + '<div class="sendDate">' + chatList[chat].sendDate + '</div></div></div>'
+            );
         }
-    }
-
-    // 보낸 채팅 보기
-    function showChat(chatMessage) {
-        var message = JSON.parse(chatMessage.body);
-        var messageClass = message.sender === '${loginMember.memberId}' ? 'sent' : 'received';
-
-        $("#chatting").append(
-            '<div class="message ' + messageClass + '"><div class="bubble ' + messageClass + '">' 
-            + '<div class="sender">' + message.sender + '</div>' // 보낸 사람 이름 추가
-            + message.message 
-            + '<div class="sendDate">' + message.sendDate + '</div></div></div>'
-        );
-
         $("#conversation").scrollTop($("#conversation")[0].scrollHeight);
     }
+}
+
+// showChat 함수
+function showChat(chatMessage) {
+    var message = JSON.parse(chatMessage.body);
+    var messageClass = message.memberNo.toString() === '${loginMember.memberNo}' ? 'sent' : 'received'; // 수정된 부분
+    $("#chatting").append(
+        '<div class="message ' + messageClass + '"><div class="bubble ' + messageClass + '">' 
+        + '<div class="sender">' + message.memberNo + '</div>' // 수정된 부분
+        + message.message 
+        + '<div class="sendDate">' + message.sendDate + '</div></div></div>'
+    );
+
+    $("#conversation").scrollTop($("#conversation")[0].scrollHeight);
+}
+
 
     $(function () {
         var isComposing = false;
@@ -246,6 +248,7 @@
         });
 
         $('#send').on('click', function() {
+        	
             sendChat();
         });
 
@@ -270,8 +273,6 @@
         });
     });
 
-
-
     // 창 키면 바로 연결
     window.onload = function () {
         connect();
@@ -281,6 +282,7 @@
         disconnect();
     }
 </script>
+
 
 
 </body>

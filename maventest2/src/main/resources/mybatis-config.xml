@@ -5,6 +5,7 @@
 <typeAliases>
 	<typeAlias type="com.ks.websocket.model.dto.Chat" alias="chat"/>
 	<typeAlias type="com.ks.websocket.member.model.dto.Member" alias="member"/>
+	<typeAlias type="com.ks.websocket.model.dto.ChatRoom" alias="chatRoom"/>
 </typeAliases>
 	<typeHandlers>
 		        <typeHandler javaType="java.time.LocalDateTime" handler="com.ks.websocket.common.LocalDateTimeTypeHandler"/>

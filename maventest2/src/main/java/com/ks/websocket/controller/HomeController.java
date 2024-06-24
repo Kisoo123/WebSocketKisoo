@@ -32,26 +32,24 @@ public class HomeController {
 	@RequestMapping(value = "/chat", method = RequestMethod.POST)
 	public String chat(
 			Model model,
-			@RequestParam(required = false) List<String> memberId,
+			@RequestParam(required = false) List<String> memberNo,
 			HttpSession session,
 			@RequestParam(required = false) Integer roomId
 			) {
-		if(memberId!=null) {
+		if(memberNo!=null) {
 			model.addAttribute("roomId",roomId);
 		}
 		
 		if(roomId==null) {
 			Map<String, Object> param = new HashMap<>();
-			param.put("memberIds", memberId);
-			param.put("memberSize", memberId.size());
+			param.put("memberNos", memberNo);
+			param.put("memberSize", memberNo.size());
 			roomId = service.selectRoomId(param);
 		}
 		List<Chat> chats = service.selectRoomChatList(roomId);
 		Gson gson = new Gson();
 		model.addAttribute("chatList",gson.toJson(chats));
 		model.addAttribute("roomId",roomId);
-		System.out.println(roomId);
-		System.out.println("chat이동=========");
 		return "chat";
 	}
 	@RequestMapping(value = "/", method=RequestMethod.GET)
@@ -66,10 +64,8 @@ public class HomeController {
 	public String chatRoom(Model model,HttpSession session,@RequestParam String inputValue) {
 		
 		Member member = service.selectMemberById(inputValue);
-		System.out.println(member.toString());
-		System.out.println(member.getMemberId());
         session.setAttribute("loginMember", member); // 여따가 필드 더 필요하면 추가
-		Map<Integer,List<Member>>roomList = service.selectMyRoomList(member.getMemberId());
+		Map<Integer,List<Member>>roomList = service.selectMyRoomList(member.getMemberNo());
 //		model.addAttribute("roomId",roomId);
 		model.addAttribute("roomList",roomList);
 		List<Member>members = service.selectAllMembers();	

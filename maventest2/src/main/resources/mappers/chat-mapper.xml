@@ -2,26 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="chat">
 	<insert id="insertChat" parameterType="chat">
-    	INSERT INTO chat VALUES ( #{chat.roomId}, #{chat.sender}, #{chat.message}, #{chat.sendDate},#{seq})
+    	INSERT INTO chat VALUES ( #{chat.roomId}, #{chat.memberNo}, #{chat.message}, #{chat.sendDate},#{seq})
 	</insert>
 	<insert id="insertChatStatus" parameterType="chat">
-		INSERT INTO CHAT_READ_STATUS values(seq_CHAT_READ_STATUS.nextval,#{seq},#{loginMember},DEFAULT,sysdate) ;
+		INSERT INTO CHAT_READ_STATUS values(seq_CHAT_READ_STATUS.nextval,#{seq},#{memberNo},default,sysdate)
 	</insert>
 	<select id="selectRoomChatList" parameterType="_int" resultMap="ChatResultMap">
 		SELECT * FROM CHAT WHERE ROOM_ID = #{roomNo}
 	</select>
-
+	<select id="selectMyRoomMembers" parameterType="int" resultMap="ChatRoomResultMap">
+		SELECT DISTINCT member_no FROM CHATroom WHERE ROOM_ID=#{roomNo}
+	</select>
 	
 	<insert id="insertRoomId" parameterType="string">
     	INSERT INTO chatroom VALUES (seq_chatroom.nextval,#{m})
 	</insert>
 	
 	<select id="selectRoomList" resultMap="MemberResultMap" parameterType="int">
-		SELECT * FROM chatroom LEFT JOIN MEMBER USING(member_id)
+		SELECT * FROM chatroom LEFT JOIN MEMBER USING(member_no)
 		WHERE room_id = #{i}
 	</select>
-	<select id="selectMyRoomId" parameterType="string" resultType="int">
-		SELECT Room_ID FROM chatroom where member_id = #{memberId}
+	<select id="selectMyRoomId" parameterType="int" resultType="int">
+		SELECT Room_ID FROM chatroom where member_No = #{memberNo}
 	</select>
 	
 	<select id="selectChatSeq" resultType="int">
@@ -29,10 +31,16 @@
 	</select>
 
 	<resultMap id="ChatResultMap" type="chat">
-	    <id property="roomId" column="ROOMID"/>
-	    <result property="sender" column="SENDER"/>
+	    <id property="roomId" column="ROOM_ID"/>
+	    <result property="memberNo" column="MEMBER_NO"/>
 	    <result property="message" column="MESSAGE"/>
 	    <result property="sendDate" column="SENDDATE" />
+	    <result property="chatId" column="CHAT_ID" />
+	</resultMap>
+	
+	<resultMap type="chatroom" id="ChatRoomResultMap">
+		<id property="roomId" column="ROOM_ID"/>
+	    <result property="memberNo" column="MEMBER_NO"/>
 	</resultMap>
 	
 	
